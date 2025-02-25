@@ -1,0 +1,1 @@
+export const loadingImg = "http://minioapi.overthinker.top/cloud/loading/loading.gif"

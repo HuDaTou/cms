@@ -1,0 +1,32 @@
+2025-02-25 02:07:53.478  INFO 18852 --- [background-preinit] o.h.v.i.u.Version                        : HV000001: Hibernate Validator 8.0.1.Final
+2025-02-25 02:07:54.347  INFO 18852 --- [main] c.o.c.w.ArticleTest                      : The following 1 profile is active: "local"
+2025-02-25 02:08:00.823  INFO 18852 --- [main] o.q.i.StdSchedulerFactory                : Using default implementation for ThreadExecutor
+2025-02-25 02:08:00.830  INFO 18852 --- [main] o.q.c.SchedulerSignalerImpl              : Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2025-02-25 02:08:00.830  INFO 18852 --- [main] o.q.c.QuartzScheduler                    : Quartz Scheduler v.2.3.2 created.
+2025-02-25 02:08:00.831  INFO 18852 --- [main] o.q.s.RAMJobStore                        : RAMJobStore initialized.
+2025-02-25 02:08:00.831  INFO 18852 --- [main] o.q.c.QuartzScheduler                    : Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2025-02-25 02:08:00.831  INFO 18852 --- [main] o.q.i.StdSchedulerFactory                : Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2025-02-25 02:08:00.832  INFO 18852 --- [main] o.q.i.StdSchedulerFactory                : Quartz scheduler version: 2.3.2
+2025-02-25 02:08:00.832  INFO 18852 --- [main] o.q.c.QuartzScheduler                    : JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@43898d09
+2025-02-25 02:08:01.667  INFO 18852 --- [main] o.q.c.QuartzScheduler                    : Scheduler quartzScheduler_$_NON_CLUSTERED started.
+2025-02-25 02:08:01.681  INFO 18852 --- [main] c.o.c.w.ArticleTest                      : Started ArticleTest in 8.578 seconds (process running for 9.618)
+2025-02-25 02:08:02.312  INFO 18852 --- [main] c.a.d.p.DruidDataSource                  : {dataSource-1} inited
+2025-02-25 02:08:02.435  INFO 18852 --- [main] p6spy                                    : #1740420482435 | took 13ms | statement | connection 0| url jdbc:mysql://home.overthinker.top:30970/easybilibili?characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+SELECT id,user_id,category_id,article_cover,article_title,article_content,article_type,is_top,status,visit_count,create_time,update_time,is_deleted FROM t_article WHERE id=?
+SELECT id,user_id,category_id,article_cover,article_title,article_content,article_type,is_top,status,visit_count,create_time,update_time,is_deleted FROM t_article WHERE id=3;
+2025-02-25 02:08:02.582  INFO 18852 --- [main] p6spy                                    : #1740420482582 | took 99ms | statement | connection 1| url jdbc:mysql://home.overthinker.top:30970/easybilibili?characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+UPDATE t_article  SET user_id=?, category_id=?, article_cover=?, article_title=?, article_content=?, article_type=?, is_top=?, status=?,   update_time=?  WHERE id=?
+UPDATE t_article  SET user_id=22, category_id=1, article_cover='https://www.baidu.com', article_title='测试文章', article_content='测试文章内容', article_type=1, is_top=0, status=1,   update_time='2025-02-25T02:08:02.480+0800'  WHERE id=3;
+2025-02-25 02:08:02.677  INFO 18852 --- [SpringApplicationShutdownHook] o.q.c.QuartzScheduler                    : Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2025-02-25 02:08:03.688  INFO 18852 --- [SpringApplicationShutdownHook] o.q.c.QuartzScheduler                    : Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+2025-02-25 02:08:03.688  INFO 18852 --- [SpringApplicationShutdownHook] o.q.c.QuartzScheduler                    : Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2025-02-25 02:08:03.688  INFO 18852 --- [SpringApplicationShutdownHook] o.q.c.QuartzScheduler                    : Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+2025-02-25 02:08:03.699  INFO 18852 --- [SpringApplicationShutdownHook] c.a.d.p.DruidDataSource                  : {dataSource-1} closing ...
+2025-02-25 02:08:03.700  INFO 18852 --- [SpringApplicationShutdownHook] c.a.d.p.DruidDataSource                  : {dataSource-1} closed
