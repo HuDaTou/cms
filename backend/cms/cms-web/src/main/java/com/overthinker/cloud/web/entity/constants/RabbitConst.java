@@ -1,7 +1,5 @@
 package com.overthinker.cloud.web.entity.constants;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 /**
  * @author overH
  * <p>
@@ -13,15 +11,15 @@ public class RabbitConst {
     /**
      * 邮件队列
      */
-    public static final String MAIL_QUEUE = "cms_email_queue";
+    public static final String MAIL_QUEUE = "email_queue";
 
     /**
      * 登录日志队列
      */
-    public static final String LOG_LOGIN_QUEUE = "cms_log_login_queue";
+    public static final String LOG_LOGIN_QUEUE = "log_login_queue";
 
     /**
      * 系统操作日志队列
      */
-    public static final String LOG_SYSTEM_QUEUE = "cms_log_system_queue";
+    public static final String LOG_SYSTEM_QUEUE = "log_system_queue";
 }

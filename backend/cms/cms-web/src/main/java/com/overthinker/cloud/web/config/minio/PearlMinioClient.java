@@ -1,4 +1,4 @@
-//package com.overthinker.cloud.web.config.minio;
+package com.overthinker.cloud.web.config.minio;//package com.overthinker.cloud.web.config.minio;
 //
 //import com.google.common.collect.Multimap;
 //import io.minio.CreateMultipartUploadResponse;

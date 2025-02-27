@@ -79,11 +79,6 @@ public class EmailQueueListener {
     private  String overthinker;
 
 
-
-
-
-
-
     /**
      * 监听邮件队列
      */
