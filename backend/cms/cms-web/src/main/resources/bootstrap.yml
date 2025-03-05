@@ -1,6 +1,7 @@
 spring:
   application:
-    name: cms-web
+#    name: cms-web
+    name: cloud-bilibili-web
   profiles:
     active: dev
   ####Spring Cloud Consul for Service Discovery

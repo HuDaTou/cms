@@ -175,7 +175,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BadCredentialsException(RespConst.TEST_ACCOUNT_MSG);
         }
 
-        // 判断用户是否具备任何权限,
+        // 判断用户是否具备任何权限
         if ((equipmentHeader != null && equipmentHeader.equals(Const.BACKEND_REQUEST) && ObjectUtils.isEmpty(roles))) {
             throw new BadCredentialsException(RespConst.NO_PERMISSION_MSG);
         }

@@ -115,10 +115,10 @@ onBeforeUnmount(() => {
         >
           <div class="flex-end">
             <span class="ant-pro-form-login-title">
-              overthinker
+              cms
             </span>
             <span class="ant-pro-form-login-desc">
-              欢迎进入overthinker后台
+              欢迎进入cms后台
             </span>
           </div>
           <div class="login-lang flex-center relative z-11">

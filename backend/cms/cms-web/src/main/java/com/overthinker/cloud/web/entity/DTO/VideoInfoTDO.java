@@ -38,7 +38,7 @@ public class VideoInfoTDO {
     private String videoTitle;
 
     @Schema(description = "视频描述")
-    private String vedioDescription;
+    private String videoDescription;
 
     @Schema(description = "视频文件格式")
     private String videoType;

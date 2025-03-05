@@ -10,7 +10,7 @@ export const constantRouter = [
                 component: () => import('@/views/Home/index.vue'),
                 name: 'home',
                 meta: {
-                    title: 'overthinker | 首页',
+                    title: 'cms | 首页',
                 }
             },
             // 时间轴

@@ -3,8 +3,10 @@ package com.overthinker.cloud.web.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.overthinker.cloud.resp.ResultData;
+import com.overthinker.cloud.web.entity.DTO.SearchVideoDTO;
 import com.overthinker.cloud.web.entity.DTO.VideoInfoTDO;
 import com.overthinker.cloud.web.entity.PO.Tag;
 import com.overthinker.cloud.web.entity.PO.Video;
@@ -17,11 +19,11 @@ import com.overthinker.cloud.web.service.VideoService;
 import com.overthinker.cloud.web.service.VideoTagService;
 import com.overthinker.cloud.web.utils.MyRedisCache;
 import com.overthinker.cloud.web.utils.SecurityUtils;
+import com.overthinker.cloud.web.utils.StringUtils;
 import com.overthinker.cloud.web.utils.VideoUploadUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,22 +61,10 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
     @Resource
     private TagMapper tagMapper;
 
-
-
-
     private final UploadEnum videoUploadEnum = UploadEnum.VIDEO_PATH;
     private final UploadEnum videoCoverUploadEnum = UploadEnum.VEDIO_COVER;
-    @Autowired
+    @Resource
     private VideoTagService videoTagService;
-
-    // 使用有界线程池防止资源耗尽
-//    private final ExecutorService uploadExecutor =
-//            Executors.newFixedThreadPool(2, r -> {
-//                Thread t = new Thread(r);
-//                t.setDaemon(true);
-//                return t;
-//            });
-
 
     @Override
     public Map<String, Object> uploadVideo( MultipartFile videoFile)  {
@@ -105,21 +95,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
         return ResultData.failure();
     }
 
-    @Override
-    public List<VideoInfoVO> getPublicVideoList() {
-        LambdaQueryWrapper<Video> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Video::getPermission, false);
-        List<Video> videos = videoMapper.selectList(queryWrapper);
-        return BeanUtil.copyToList(videos, VideoInfoVO.class);
-    }
 
-    @Override
-    public List<VideoInfoVO> getUserVideoList(Long userId) {
-        LambdaQueryWrapper<Video> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Video::getUserId, userId);
-        List<Video> videos = videoMapper.selectList(queryWrapper);
-        return BeanUtil.copyToList(videos, VideoInfoVO.class);
-    }
 
     @Override
     public List<VideoInfoVO> getUserAndPublicVideoList(@NotNull Integer pageNum, @NotNull Integer pageSize) {
@@ -157,15 +133,32 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
 
 
     @Override
-    public String deleteVideo(Long id) {
-        boolean b = this.removeById(id);
-        return b ? "删除成功" : "删除失败";
+    public ResultData<Void> deleteVideo(List<Long> ids) {
+        // 删除视频
+        // 创建更新条件
+        LambdaUpdateWrapper<Video> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(Video::getIsDeleted, true)  // 将isDeleted设置为true
+                .in(Video::getId, ids);          // 条件：id在传入的ids列表中
+
+        // 执行更新操作
+        boolean result = this.update(updateWrapper);
+        if (result) {
+            // 删除标签关系
+            videoTagMapper.delete(new LambdaQueryWrapper<VideoTag>().in(VideoTag::getVideoId, ids));
+            // 删除点赞、收藏、评论
+//            likeMapper.delete(new LambdaQueryWrapper<Like>().eq(Like::getType, LikeEnum.LIKE_TYPE_ARTICLE.getType()).and(a -> a.in(Like::getTypeId, ids)));
+//            favoriteMapper.delete(new LambdaQueryWrapper<Favorite>().eq(Favorite::getType, FavoriteEnum.FAVORITE_TYPE_ARTICLE.getType()).and(a -> a.in(Favorite::getTypeId, ids)));
+//            commentMapper.delete(new LambdaQueryWrapper<Comment>().eq(Comment::getType, CommentEnum.COMMENT_TYPE_ARTICLE.getType()).and(a -> a.in(Comment::getTypeId, ids)));
+            return ResultData.success();
+        }
+        return ResultData.failure();
     }
 
     @Override
     public String getVideoCachePath() {
         return "";
     }
+
 
     @Override
     public String uploadVideoCover(MultipartFile videoCover) {
@@ -181,14 +174,77 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
         else myRedisCache.setCacheObject(RedisConst.VIDEO_VISIT_COUNT + id, 0);
     }
 
+    @Override
+    public List<VideoInfoVO> searchVideoInfo(SearchVideoDTO searchVideoDTO) {
+            LambdaQueryWrapper<Video> wrapper = new LambdaQueryWrapper<>();
+            wrapper.like(StringUtils.isNotNull(searchVideoDTO.getVideoTitle()), Video::getVideoTitle, searchVideoDTO.getVideoTitle())
+                    .eq(StringUtils.isNotNull(searchVideoDTO.getCategoryId()), Video::getCategoryId, searchVideoDTO.getCategoryId())
+                    .eq(StringUtils.isNotNull(searchVideoDTO.getPermission()), Video::getPermission, searchVideoDTO.getPermission());
+            List<VideoInfoVO> videoInfoVOS = videoMapper.selectList(wrapper).stream().map(video -> video.asViewObject(VideoInfoVO.class)).toList();
+            if (!videoInfoVOS.isEmpty()) {
+                videoInfoVOS.forEach(videoInfoVO -> {
+                    videoInfoVO.setCategoryName(categoryMapper.selectById(videoInfoVO.getCategoryId()).getCategoryName());
+                    videoInfoVO.setUserName(userMapper.selectById(videoInfoVO.getUserId()).getUsername());
+                    // 查询视频标签
+                    List<Long> tagIds = videoTagMapper.selectList(new LambdaQueryWrapper<VideoTag>().eq(VideoTag::getVideoId, videoInfoVO.getId())).stream().map(VideoTag::getTagId).toList();
+                    videoInfoVO.setTagsName(tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
+                });
+                return videoInfoVOS;
+            }
+            return null;
+        }
+    @Override
+    public List<VideoInfoVO> listVideo() {
+        List<VideoInfoVO> videoInfoVOS = videoMapper.selectList(new LambdaQueryWrapper<Video>()
+                .orderByDesc(Video::getCreateTime)).stream().map(video ->
+//                video.asViewObject(VideoInfoVO.class
+                BeanUtil.copyProperties(video, VideoInfoVO.class)
+        ).toList();
+
+        if (!videoInfoVOS.isEmpty()) {
+            videoInfoVOS.forEach(videoInfoVO -> {
+                videoInfoVO.setCategoryName(categoryMapper.selectById(videoInfoVO.getCategoryId()).getCategoryName());
+                videoInfoVO.setUserName(userMapper.selectById(videoInfoVO.getUserId()).getUsername());
+                // 查询视频标签
+                List<Long> tagIds = videoTagMapper.selectList(new LambdaQueryWrapper<VideoTag>().eq(VideoTag::getVideoId, videoInfoVO.getId())).stream().map(VideoTag::getTagId).toList();
+                videoInfoVO.setTagsName(tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
+            });
+            return videoInfoVOS;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public Void updateVideoPermission(Long videoId, boolean permission) {
+        // 构建更新条件
+        LambdaUpdateWrapper<Video> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Video::getId, videoId)
+                .set(Video::getPermission, permission);
+
+        // 执行更新
+        boolean success = this.update(updateWrapper);
+
+        if (!success) {
+            throw new RuntimeException("视频权限更新失败");
+        }
+        return null;
+    }
 
 
-
-
-
-
-
-
+    @Override
+    public String publishVideo(Long videoId) {
+        // 根据videoId获取视频
+        Video video = this.getById(videoId);
+        if (video == null) {
+            return "视频不存在";
+        }
+        // 取反status状态
+        video.setStatus(!video.getStatus());
+        // 更新数据库
+        boolean result = this.updateById(video);
+        return result ? "操作成功" : "操作失败";
+    }
 
 
 }

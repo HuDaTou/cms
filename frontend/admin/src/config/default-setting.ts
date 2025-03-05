@@ -1,7 +1,7 @@
 import type { LayoutSetting } from '~@/stores/app'
 
 export default {
-  'title': 'overthinker',
+  'title': 'cms',
   'theme': 'light',
   'logo': 'http://minioapi.overthinker.top/cloud/logo/Logo%20%E8%AE%BE%E8%AE%A1.png',
   'collapsed': false,
@@ -24,7 +24,7 @@ export default {
   'accordionMode': false,
   'leftCollapsed': true,
   'headerHeight': 48,
-  'copyright': 'overthinker 2024',
+  'copyright': 'cms 2024',
   'animationName': 'slide-fadein-right',
 } as LayoutSetting
 

@@ -39,7 +39,7 @@ public class Video implements BaseData {
         private String videoTitle;
 
 
-        private String vedioDescription;
+        private String videoDescription;
 
 
         private String videoType;
@@ -53,7 +53,7 @@ public class Video implements BaseData {
 
         private String videoSize;
 
-        private Long videoCount;
+        private Long videoVisit;
 
 
         //文章创建时间
